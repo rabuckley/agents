@@ -48,4 +48,53 @@ link codex/rules    "$codex_home/rules"
 
 link AGENTS.md      "$HOME/.copilot/copilot-instructions.md"
 
+# Runs a plugin CLI command unless dry-running; a failure is reported, not fatal.
+run() {
+  echo "run     $*"
+  (( dry_run )) && return
+  "$@" || { echo "FAIL    $*" >&2; skipped=1; }
+}
+
+# Third-party skills are installed as plugins rather than vendored into
+# skills/, so they update upstream and don't shadow the ones written here.
+# Codex and Copilot error on re-adds, so each step checks the tool's list first.
+plugin() {
+  local tool="$1" repo_slug="$2" marketplace="$3" name="$4"
+
+  if ! command -v "$tool" >/dev/null; then
+    echo "SKIP    $tool not on PATH; $name@$marketplace not installed"
+    return
+  fi
+
+  case "$tool" in
+    claude)
+      # Claude's add and install are both no-ops when already done.
+      run claude plugin marketplace add "$repo_slug"
+      run claude plugin install "$name@$marketplace"
+      ;;
+    codex)
+      codex plugin marketplace list 2>/dev/null | grep -q "^$marketplace " \
+        || run codex plugin marketplace add "$repo_slug"
+      if codex plugin list 2>/dev/null | grep -Eq "^$name@$marketplace +installed"; then
+        echo "ok      codex $name@$marketplace"
+      else
+        run codex plugin add "$name@$marketplace"
+      fi
+      ;;
+    copilot)
+      copilot plugin marketplace list 2>/dev/null | grep -q " $marketplace " \
+        || run copilot plugin marketplace add "$repo_slug"
+      if copilot plugin list 2>/dev/null | grep -q " $name@$marketplace "; then
+        echo "ok      copilot $name@$marketplace"
+      else
+        run copilot plugin install "$name@$marketplace"
+      fi
+      ;;
+  esac
+}
+
+for tool in claude codex copilot; do
+  plugin "$tool" mattpocock/skills mattpocock mattpocock-skills
+done
+
 exit "$skipped"
