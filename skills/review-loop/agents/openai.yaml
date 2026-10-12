@@ -1,0 +1,5 @@
+interface:
+  display_name: "Review Loop"
+  short_description: "Review, verify, fix and re-review a branch"
+policy:
+  allow_implicit_invocation: false
