@@ -1,0 +1,5 @@
+interface:
+  display_name: "Design Review"
+  short_description: "Review concepts, rule ownership and boundaries"
+policy:
+  allow_implicit_invocation: false
