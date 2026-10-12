@@ -13,7 +13,7 @@ Judge how much callers can do against what they must know. Review **Shape** (the
 
 `$ARGUMENTS`
 
-A path or name selects the current surface; a git ref selects changes against its merge-base with HEAD; a proposal selects its declared contract. With no argument, use the default branch (`origin/HEAD`), falling back to `main`, then `master`. Include staged, unstaged, and relevant untracked changes. If no base exists, review those local changes and state the limitation. Report the selected scope and base. If no public surface is in scope, say so and stop.
+A path or name selects the current surface; a git ref selects changes against its merge-base with HEAD; a proposal selects its declared contract. With no argument, run `git fetch origin` and use the default branch (`origin/HEAD`, else `origin/main`, then `origin/master`). Start from `git diff --stat <base>...HEAD`, then read the diff per file. Include staged, unstaged, and relevant untracked changes. If no base exists, review those local changes and state the limitation. Report the selected scope and base. If no public surface is in scope, say so and stop.
 
 Read complete declarations, documentation, and real callers, including tests and samples. Inspect implementation only to establish exposed behaviour, ownership, errors, or cost. For stubbed bodies, use the documented contract. Missing samples or unavailable callers are evidence limitations, not defects by themselves.
 

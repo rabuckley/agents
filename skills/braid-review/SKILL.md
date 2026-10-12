@@ -21,10 +21,11 @@ every suspicion, in any order, for as long as the review runs.
 
 `$ARGUMENTS`
 
-When no target is given, review the working diff (`git diff
-origin/HEAD...HEAD` plus `git diff HEAD`; fall back to `git diff main...HEAD`).
-A git ref or range diffs against that; a path reviews those files as they
-stand. Always read the enclosing function or module of each hunk — braids live
+When no target is given, run `git fetch origin` and review the working diff
+against the default branch (`origin/HEAD`, else `origin/main`) plus `git diff
+HEAD`. A git ref or range diffs against that; a path reviews those files as
+they stand. Start from `git diff --stat <base>...HEAD`, then read the diff per
+file. Always read the enclosing function or module of each hunk — braids live
 in structure the hunk only touches.
 
 ## The tests

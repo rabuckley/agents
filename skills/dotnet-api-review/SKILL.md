@@ -20,7 +20,7 @@ The review is standing criteria, not steps: apply every test to every suspicion 
 
 `$ARGUMENTS`
 
-With no argument, review the public surface changed in the working diff (`git diff origin/HEAD...HEAD` plus `git diff HEAD`; fall back to `main...HEAD`). A path or type name reviews that surface as it stands; a git ref diffs against it; an API proposal file (the dotnet/runtime template or any sketch) reviews the proposal, and a proposal without usage samples is itself a finding, since scenario code is the instrument. Scope is the public and protected members of public types, plus the documented contract. Always read the whole type, not just the hunk, and read it as a caller would: the member list, the XML docs, and the tests or samples that use it.
+With no argument, run `git fetch origin` and review the public surface changed against the default branch (`origin/HEAD`, else `origin/main`) plus `git diff HEAD`. Start from `git diff --stat <base>...HEAD`, then read the diff per file. A path or type name reviews that surface as it stands; a git ref diffs against it; an API proposal file (the dotnet/runtime template or any sketch) reviews the proposal, and a proposal without usage samples is itself a finding, since scenario code is the instrument. Scope is the public and protected members of public types, plus the documented contract. Always read the whole type, not just the hunk, and read it as a caller would: the member list, the XML docs, and the tests or samples that use it.
 
 Then find the scenarios the API exists to serve: tests, samples, docs, the motivating issue. Confirm scope is non-empty; if it is, say so and stop.
 
