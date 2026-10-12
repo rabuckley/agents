@@ -1,0 +1,13 @@
+# Tool-written state that lands here through symlinked dirs
+skills/synced/
+skills/.trash/
+skills/.system/
+codex/rules/default.rules
+
+# Codex runtime state from a session started with CODEX_HOME pointing here
+agentic/
+
+# Machine-local
+*.local.*
+local/
+.DS_Store

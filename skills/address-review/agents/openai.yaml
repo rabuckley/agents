@@ -1,0 +1,3 @@
+interface:
+  display_name: "Address Review"
+  short_description: "Address a code review"

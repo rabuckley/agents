@@ -1,0 +1,4 @@
+# Keep LF on every OS: Codex .rules files and skill shell scripts break with
+# CRLF, and Git for Windows converts on checkout by default.
+* text=auto eol=lf
+*.ps1 text eol=crlf
