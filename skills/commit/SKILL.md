@@ -11,9 +11,13 @@ Status:
 
 !`git status --short`
 
-Recent messages, for the repo's conventions:
+Recent subjects, for the repo's conventions:
 
-!`git log -10 --no-merges --format='--- %s%n%b'`
+!`git log -10 --no-merges --format=%s`
+
+The latest two in full:
+
+!`git log -2 --no-merges --format=%n%B`
 
 ## What goes in
 
