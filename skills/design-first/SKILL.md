@@ -41,8 +41,8 @@ Test seam: <where the behaviour is observed>
 Open: <questions only the user can answer>
 ```
 
-Save the note to `.scratch/design/<branch>.md`, so that later reviewers can use it as the spec.
+Save the note as `design/<branch>.md` so that later reviewers can use it as the spec. Put it in the harness's session scratchpad if it has one, such as the scratchpad directory in Claude Code's system prompt. That directory is outside the repo and doesn't need write approval. Otherwise, put it under `.scratch/` in the repo. Codex, for example, has no scratchpad. Give the user the note's full path.
 
 ## 4. Get the yes
 
-Present the note and wait. Implement only after the user approves it, folding in their changes. Afterwards, `/review-loop` reviews the work against the note.
+Present the note and wait. Implement only after the user approves it, folding in their changes. Afterwards, `/review-loop` reviews the work against the note. A scratchpad doesn't outlast its session, so for a review in a later session, pass the note's path or copy the note into `.scratch/`.

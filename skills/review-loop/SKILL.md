@@ -21,7 +21,7 @@ Then record the following:
 
 - **Round scope**: `<base>...HEAD` in a fresh run's first round, and `<last reviewed sha>..HEAD` after that.
 - **Reviewed tip**: the `HEAD` sha the round reviews.
-- **Purpose**: what the branch is for, in a sentence or two. Take it from the spec if there is one: an issue referenced in the commits, a design note under `.scratch/` or `docs/`, or a path the user gave. Otherwise infer it from the commit messages and the branch name. For a bug fix, the purpose is the reported failure *and its root cause*, so other paths to the same cause are in scope. For developer-facing work, it's the stated goal, such as faster tests or a simpler build. If the purpose can't be inferred, ask the user for one sentence before reviewing.
+- **Purpose**: what the branch is for, in a sentence or two. Take it from the spec if there is one: an issue referenced in the commits, a design note in the session scratchpad, `.scratch/` or `docs/`, or a path the user gave. Otherwise infer it from the commit messages and the branch name. For a bug fix, the purpose is the reported failure *and its root cause*, so other paths to the same cause are in scope. For developer-facing work, it's the stated goal, such as faster tests or a simpler build. If the purpose can't be inferred, ask the user for one sentence before reviewing.
 - **Checks**: the repo's own build, test, lint and spelling commands, from its CI workflow, `package.json` or build files.
 
 Done when the round scope resolves, its `--stat` is in hand, and the checks are listed.
