@@ -28,10 +28,13 @@ Done when the round scope resolves, its `--stat` is in hand, and the checks are 
 
 ## 2. Review in parallel
 
+First, establish once what every subagent would otherwise re-derive. Run the checks at the reviewed tip, unless step 4 has just run them there. In a run's first round of a bug fix, also run the branch's new or changed tests against the base's code, in a scratch worktree, to see whether they fail without the fix. Record the commands and their results as the **Established** block.
+
 This skill asks you to delegate. Spawn one subagent per lens in a single turn: in Claude Code with the Agent tool, in Codex with `spawn_agent` and `fork_turns="none"`. Without that setting a Codex subagent inherits this conversation and reviews with the author's reasoning in mind. Keep the fan-out to the lenses below. Give each subagent a self-contained brief:
 
 - The round scope as a diff **command**, plus its `--stat` and commit list. Don't paste the diff: the subagent reads what it needs.
 - The lens brief below. Where a brief names a skill, give the absolute path of its `SKILL.md`, resolved from this file's directory, and tell the subagent to read that file and follow it in report-only mode. These skills are user-invoked, so a subagent can't load them by name.
+- The **Established** block, with the instruction: *these results are settled; don't rerun them. Run a command only to test a scenario they don't cover.*
 - The **ledger** from earlier rounds (see step 5), so that it doesn't re-raise settled findings.
 - The return format under *Finding format*.
 
@@ -40,7 +43,7 @@ This skill asks you to delegate. Spawn one subagent per lens in a single turn: i
 | Correctness | Find bugs a user or caller would observe: wrong results, lost or duplicated work, broken contracts, unsafe concurrency, unhandled failure paths. Read the callers and the configuration around each hunk, not just the hunk itself. | Always |
 | Design | Follow [`../design-review/SKILL.md`](../design-review/SKILL.md): check concepts, rule ownership, boundaries, invariants and premises together. | Always |
 | Tests | Follow [`../test-review/SKILL.md`](../test-review/SKILL.md) on the round scope. | When the scope changes tests or testable behaviour |
-| Purpose | Check that the change achieves its purpose completely. Find parts that are missing, partial or wrong, and behaviour unrelated to the purpose. Quote the spec line where there is one. For a bug fix, check that the fix removes the root cause rather than the reported symptom, and that a test fails on the base without it. | A run's first round |
+| Purpose | Check that the change achieves its purpose completely. Find parts that are missing, partial or wrong, and behaviour unrelated to the purpose. Quote the spec line where there is one. For a bug fix, check that the fix removes the root cause rather than the reported symptom, and use the Established block to check that a test fails on the base without it. | A run's first round |
 
 ### Finding format
 
@@ -65,7 +68,7 @@ Filter first:
 - Check each `pre-existing` finding before shelving it. Confirm it's outside the purpose, and look once at the same behaviour on the base. Move it to the follow-ups only if both hold. Otherwise regrade it and verify it like any other finding.
 - Deduplicate: two findings with the same root cause become one. Keep every lens's scenario, because each one is evidence.
 
-Then give every remaining finding to a fresh-context verifier subagent, spawned the same way as the reviewers. Batch findings by file or module, with at most four verifiers, and give each one the findings verbatim plus the diff command. The verifier's job is to **disprove**:
+Then give every remaining finding to a fresh-context verifier subagent, spawned the same way as the reviewers. Batch findings by file or module, with at most four verifiers, and give each one the findings verbatim, the diff command and the Established block, with the same instruction not to rerun it. The verifier's job is to **disprove**:
 
 - Reproduce the scenario from the code. Trace the actual callers, configuration, schema and infrastructure (the topic settings, the table definitions, the DI registrations). Run a test or a query where that's cheap. When the scenario depends on a fact the verifier can't establish, the verdict is `unverified`, not `confirmed`.
 - Judge the diagnosis and the proposed fix separately, because a right diagnosis often comes with a wrong prescription.
