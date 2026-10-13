@@ -58,6 +58,8 @@ run() {
 # Third-party skills are installed as plugins rather than vendored into
 # skills/, so they update upstream and don't shadow the ones written here.
 # Codex and Copilot error on re-adds, so each step checks the tool's list first.
+# Lists are captured before grepping: `list | grep -q` under pipefail fails
+# when grep exits early and the lister dies of SIGPIPE.
 plugin() {
   local tool="$1" repo_slug="$2" marketplace="$3" name="$4"
 
@@ -73,18 +75,18 @@ plugin() {
       run claude plugin install "$name@$marketplace"
       ;;
     codex)
-      codex plugin marketplace list 2>/dev/null | grep -q "^$marketplace " \
+      grep -q "^$marketplace " <<<"$(codex plugin marketplace list 2>/dev/null)" \
         || run codex plugin marketplace add "$repo_slug"
-      if codex plugin list 2>/dev/null | grep -Eq "^$name@$marketplace +installed"; then
+      if grep -Eq "^$name@$marketplace +installed" <<<"$(codex plugin list 2>/dev/null)"; then
         echo "ok      codex $name@$marketplace"
       else
         run codex plugin add "$name@$marketplace"
       fi
       ;;
     copilot)
-      copilot plugin marketplace list 2>/dev/null | grep -q " $marketplace " \
+      grep -q " $marketplace " <<<"$(copilot plugin marketplace list 2>/dev/null)" \
         || run copilot plugin marketplace add "$repo_slug"
-      if copilot plugin list 2>/dev/null | grep -q " $name@$marketplace "; then
+      if grep -q " $name@$marketplace " <<<"$(copilot plugin list 2>/dev/null)"; then
         echo "ok      copilot $name@$marketplace"
       else
         run copilot plugin install "$name@$marketplace"
