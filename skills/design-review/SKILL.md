@@ -25,7 +25,7 @@ The findings worth raising are where concept, ownership and boundary meet. A con
 
 With no target, run `git fetch origin` and review the branch against the default branch (`origin/HEAD`, else `origin/main`), plus `git diff HEAD`. A git ref diffs against that ref. A path reviews those files as they stand.
 
-Start from `git diff --stat <base>...HEAD`, then read the diff file by file. Ownership can't be judged from a hunk alone, so read each touched module in full, along with its callers.
+Start from `git diff --stat <base>...HEAD`, then read the diff file by file. Ownership can't be judged from a hunk alone, so read each touched module in full, along with its callers. Then, for each concept whose rule the change adds or alters, find the code outside the diff that implements the same concept, such as a sibling handler or another path to the same state, and set the paths side by side: their inputs, the rules each applies, and their effects.
 
 ## Learn the domain first
 
@@ -51,7 +51,8 @@ Ask these of every module, type and rule the change adds or reshapes. Use the [c
    - callers re-derive the rule;
    - the rule is copied across layers;
    - a domain rule lives in an adapter, a handler or infrastructure;
-   - a caller makes a decision the callee should make.
+   - a caller makes a decision the callee should make;
+   - sibling paths that implement the same concept apply different rules.
 
    Two pieces of code are copies of one rule only if they change for the same reason. Show the shared business rule or the history of them changing together. Code that only looks alike stays separate. Parsing untrusted input into a domain type is the edge's own rule, not a copy of the domain's.
 3. **Boundary.** Check that each boundary falls where the reason to change does. It's a finding when:
