@@ -89,7 +89,7 @@ Stop at the first of these:
 
 - **Converged**: the round confirmed nothing.
 - **Round 2 done**: there's no round 3. Fix round 2's `confirmed` findings only when the fix is local. Otherwise move them to `decision`. No reviewer sees these fixes, so give each one to a verifier with its finding. The verifier checks that the fix resolves the finding and changes nothing else. Revert any fix that fails and move its finding to `decision`.
-- **Not converging**: a round-2 finding traces to a round-1 fix. That fix treated a symptom. Report the pair as one `decision` item and don't patch it again.
+- **Not converging**: a round-2 finding refutes a round-1 diagnosis, so that fix treated a symptom. Report the pair as one `decision` item and don't patch it again. A finding that faults only how a sound diagnosis was carried out is an ordinary round-2 finding.
 
 Otherwise, set the round scope to `<reviewed tip>..HEAD` and return to step 2. Round 2 reviews the fix commits only, so drop the Purpose lens.
 
