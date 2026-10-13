@@ -61,7 +61,7 @@ Ask every reviewer for this format. Reviewers report everything they find and gr
 
 Filter first:
 
-- Drop nits, and anything the repo's linters or analyzers already catch.
+- Drop nits, and anything the repo's linters or analyzers already catch. Keep a nit that says a rule is copied, or that sibling paths treat the same concept differently: it's minor only locally, and a later round's recurrence check in step 4 needs it in the ledger.
 - Check each `pre-existing` finding before shelving it. Confirm it's outside the purpose, and look once at the same behaviour on the base. Move it to the follow-ups only if both hold. Otherwise regrade it and verify it like any other finding.
 - Deduplicate: two findings with the same root cause become one. Keep every lens's scenario, because each one is evidence.
 
@@ -77,13 +77,18 @@ Done when every finding has a verdict with evidence.
 
 ## 4. Fix and commit
 
-Fix the `confirmed` findings, following the *Address the feedback* section of [`../address-review/SKILL.md`](../address-review/SKILL.md). In short, group by root cause before editing, look for the fix that removes the cause, and escalate any invariant that a reshape could make true by construction rather than guarding it. When a fix turns out to need a decision, move it to the `decision` pile instead of choosing.
+Group the `confirmed` findings by root cause. Move a group to `decision` instead of fixing it, with the reshape that would make it true by construction as one option and the local fix as the other, when either holds:
+
+- **Recurrence**: its concept already has a `confirmed` or `decision` entry in the ledger from an earlier round or run, either on the same concept or on a parallel code path. A second hit after a fix means the local fixes are treating a missing owner. Findings from the current round don't count: two of them on one concept are the spread check's job, and a finding that names the missing owner stands on its own. Name the earlier ledger ids in the item.
+- **Spread**: the fix adds the same rule to more than one code path.
+
+Fix the remaining groups, following the *Address the feedback* section of [`../address-review/SKILL.md`](../address-review/SKILL.md). In short, look for the fix that removes the cause, and escalate any invariant that a reshape could make true by construction rather than guarding it. When a fix turns out to need a decision, move it to the `decision` pile instead of choosing.
 
 Run the checks that cover the change. Commit each root-cause group as a **plain commit** per [`../commit/SKILL.md`](../commit/SKILL.md), without `fixup!` or `amend!`. History is restructured once, before the PR.
 
 ## 5. Update the ledger and decide whether to loop
 
-The ledger records the round number and reviewed tip, plus one line per finding: its id, the claim, the verdict, the reason, and the commit for a fixed finding. Keep it in `$(git rev-parse --git-dir)/review-loop/<branch>.md`, where it survives compaction and is never committed. Give it to every later reviewer, with the instruction: *a ledgered finding is settled. Raise it again only with new evidence the ledger doesn't address.*
+The ledger records the round number and reviewed tip, plus one line per finding: its id, the concept or rule it lands on, the claim, the verdict, the reason, and the commit for a fixed finding. Keep it in `$(git rev-parse --git-dir)/review-loop/<branch>.md`, where it survives compaction and is never committed. Give it to every later reviewer, with the instruction: *a ledgered finding is settled. Raise it again only with new evidence the ledger doesn't address.*
 
 Stop at the first of these:
 
@@ -95,11 +100,17 @@ Otherwise, set the round scope to `<reviewed tip>..HEAD` and return to step 2. R
 
 ## 6. Hand off
 
+Convergence means the diffs stopped producing findings, not that the design is right: a loop that reviews only diffs can converge on a series of local patches. So when the ledger holds any `confirmed` or `decision` finding, give one fresh-context subagent the branch diff command, the ledger and this question:
+
+> Which single reshape, if it had existed before this branch, would have prevented the most findings in this ledger? Name the ledger ids it would have prevented and the code it would retire, with file:line. "None" is a valid answer.
+
+Add its answer to the decision items unless it repeats one already there.
+
 Before reporting, run the full set of checks from step 1. CI failures after the PR opens cost a whole extra round.
 
 Report:
 
-1. **Needs your decision**: each `decision` and `unverified` item, with the options, the evidence and your recommendation. This is the main output, so put it first.
+1. **Needs your decision**: each `decision` and `unverified` item, and the step-back reshape, with the options, the evidence and your recommendation. This is the main output, so put it first.
 
    When the root-cause fix addresses the branch's purpose, recommend doing it in this branch. Recommend a follow-up only for work outside the purpose. Never recommend a guard as the interim fix for an invariant a reshape would make true by construction. Per address-review, guards written now are the reason the reshape never happens.
 2. **Fixed**: one line per root-cause group, with its commit.
