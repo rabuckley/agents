@@ -36,10 +36,13 @@ Keep it to one screen:
 Premise: <the evidence from step 1>
 Concepts: <each domain concept involved, in the domain's words, and the module that owns it>
 Approach: <the chosen design: the modules touched, the interface changes, where each rule lives>
+Relies on: <each behaviour of existing code the approach needs to be safe (retry, idempotency, transaction scope, ordering, rollback)> — <file:line that guarantees it>
 Rejected: <approach> — <reason>, one line each
 Test seam: <where the behaviour is observed>
 Open: <questions only the user can answer>
 ```
+
+Hold `Relies on` to the evidence bar of step 1: read the code that provides each behaviour. A name such as `RetryPolicy` or `Session` is not a citation. A behaviour you can't cite goes under `Open`, and the note isn't ready for approval until each entry has a citation or an answer.
 
 Save the note as `design/<branch>.md` so that later reviewers can use it as the spec. Put it in the harness's session scratchpad if it has one, such as the scratchpad directory in Claude Code's system prompt. That directory is outside the repo and doesn't need write approval. Otherwise, put it under `.scratch/` in the repo. Codex, for example, has no scratchpad. Give the user the note's full path.
 
