@@ -13,7 +13,7 @@ Show that the problem exists before designing for it:
 
 - **A race or ordering problem**: give the caller chain, with file:line for each hop, that produces the interleaving, and the configuration that allows it (concurrency settings, delivery guarantees, locks).
 - **A capacity, size or performance problem**: measure it. Query production or representative data for the real distribution: the maximum, the p99, the growth rate. If you can't measure it, say what would.
-- **A reported bug**: reproduce it, or trace the path that produces it.
+- **A reported bug**: reproduce it, or trace the path that produces it. Then list every code path that reaches the same cause, with file:line and counts, because the design decides which level owns the fix.
 
 When the premise fails, stop and report. The design is then "don't build it".
 
