@@ -21,14 +21,14 @@ Then record the following:
 
 - **Round scope**: `<base>...HEAD` in a fresh run's first round, and `<last reviewed sha>..HEAD` after that.
 - **Reviewed tip**: the `HEAD` sha the round reviews.
-- **Purpose**: what the branch is for, in a sentence or two. Take it from the spec if there is one: an issue referenced in the commits, a design note in the session scratchpad, `.scratch/` or `docs/`, or a path the user gave. Otherwise infer it from the commit messages and the branch name. For a bug fix, the purpose is the reported failure *and its root cause*, so other paths to the same cause are in scope. For developer-facing work, it's the stated goal, such as faster tests or a simpler build. If the purpose can't be inferred, ask the user for one sentence before reviewing.
+- **Purpose**: what the branch is for, in a sentence or two. Take it from the spec if there is one: an issue referenced in the commits, a design note in the session scratchpad, `.scratch/` or `docs/`, or a path the user gave. Otherwise infer it from the commit messages and the branch name. For a bug fix, the purpose is the reported failure *and its root cause*. Name the cause, not the mechanism the spec chose. A spec that scopes sibling paths out decides what the branch fixes, not what the review covers, so other paths to the same cause stay in scope. For developer-facing work, it's the stated goal, such as faster tests or a simpler build. If the purpose can't be inferred, ask the user for one sentence before reviewing.
 - **Checks**: the repo's own build, test, lint and spelling commands, from its CI workflow, `package.json` or build files.
 
 Done when the round scope resolves, its `--stat` is in hand, and the checks are listed.
 
 ## 2. Review in parallel
 
-First, establish once what every subagent would otherwise re-derive. Run the checks at the reviewed tip, unless step 4 has just run them there. In a run's first round of a bug fix, also run the branch's new or changed tests against the base's code, in a scratch worktree, to see whether they fail without the fix. Record the commands and their results as the **Established** block.
+First, establish once what every subagent would otherwise re-derive. Run the checks at the reviewed tip, unless step 4 has just run them there. In a run's first round of a bug fix, also do two things. Take the **inventory**: every code path in the codebase that reaches the cause, with file:line and a count, and how many of those paths the branch changes. Then run the branch's new or changed tests against the base's code, in a scratch worktree, to see whether they fail without the fix. Record the commands and their results as the **Established** block.
 
 This skill asks you to delegate. Spawn one subagent per lens in a single turn: in Claude Code with the Agent tool, in Codex with `spawn_agent` and `fork_turns="none"`. Without that setting a Codex subagent inherits this conversation and reviews with the author's reasoning in mind. Keep the fan-out to the lenses below. Give each subagent a self-contained brief:
 
@@ -43,7 +43,7 @@ This skill asks you to delegate. Spawn one subagent per lens in a single turn: i
 | Correctness | Find bugs a user or caller would observe: wrong results, lost or duplicated work, broken contracts, unsafe concurrency, unhandled failure paths. Read the callers and the configuration around each hunk, not just the hunk itself. | Always |
 | Design | Follow [`../design-review/SKILL.md`](../design-review/SKILL.md): check concepts, rule ownership, boundaries, invariants and premises together. | Always |
 | Tests | Follow [`../test-review/SKILL.md`](../test-review/SKILL.md) on the round scope. | When the scope changes tests or testable behaviour |
-| Purpose | Check that the change achieves its purpose completely. Find parts that are missing, partial or wrong, and behaviour unrelated to the purpose. Quote the spec line where there is one. For a bug fix, check that the fix removes the root cause rather than the reported symptom, and use the Established block to check that a test fails on the base without it. | A run's first round |
+| Purpose | Check that the change achieves its purpose completely. Find parts that are missing, partial or wrong, and behaviour unrelated to the purpose. Quote the spec line where there is one. For a bug fix, check that the fix removes the root cause rather than the reported symptom, use the inventory to judge the paths it leaves on the cause, and use the Established block to check that a test fails on the base without it. | A run's first round |
 
 ### Finding format
 
@@ -64,7 +64,7 @@ Ask every reviewer for this format. Reviewers report everything they find and gr
 
 Filter first:
 
-- Drop nits, and anything the repo's linters or analyzers already catch. Keep a nit that says a rule is copied, or that sibling paths treat the same concept differently: it's minor only locally, and a later round's recurrence check in step 4 needs it in the ledger.
+- Drop nits, and anything the repo's linters or analyzers already catch. Keep a nit that says a rule is copied, or that sibling paths treat the same concept differently: it's minor only locally, and step 4's convergence check needs it now and its recurrence check needs it in the ledger.
 - Check each `pre-existing` finding before shelving it. Confirm it's outside the purpose, and look once at the same behaviour on the base. Move it to the follow-ups only if both hold. Otherwise regrade it and verify it like any other finding.
 - Deduplicate: two findings with the same root cause become one. Keep every lens's scenario, because each one is evidence.
 
@@ -80,10 +80,13 @@ Done when every finding has a verdict with evidence.
 
 ## 4. Fix and commit
 
-Group the `confirmed` findings by root cause. Move a group to `decision` instead of fixing it, with the reshape that would make it true by construction as one option and the local fix as the other, when either holds:
+Group the `confirmed` findings by root cause. Move a group to `decision` instead of fixing it, with the reshape that would make it true by construction as one option and the local fix as the other, when any of these holds:
 
-- **Recurrence**: its concept already has a `confirmed` or `decision` entry in the ledger from an earlier round or run, either on the same concept or on a parallel code path. A second hit after a fix means the local fixes are treating a missing owner. Findings from the current round don't count: two of them on one concept are the spread check's job, and a finding that names the missing owner stands on its own. Name the earlier ledger ids in the item.
+- **Recurrence**: its concept already has a `confirmed` or `decision` entry in the ledger from an earlier round or run, either on the same concept or on a parallel code path. A second hit after a fix means the local fixes are treating a missing owner. Name the earlier ledger ids in the item.
+- **Convergence**: in this round, findings from three or more lenses land on its concept, counted before step 3's deduplication, or a finding says its rule is stated or decided in several places with no single module enforcing it.
 - **Spread**: the fix adds the same rule to more than one code path.
+
+For a Recurrence or Convergence group, ask the owner question from step 6 about its concept now, before fixing the other groups. Attach the answer to the `decision` item, and leave unfixed any group whose code the answer would retire.
 
 Fix the remaining groups, following the *Address the feedback* section of [`../address-review/SKILL.md`](../address-review/SKILL.md). In short, look for the fix that removes the cause, and escalate any invariant that a reshape could make true by construction rather than guarding it. When a fix turns out to need a decision, move it to the `decision` pile instead of choosing.
 
@@ -103,9 +106,9 @@ Otherwise, set the round scope to `<reviewed tip>..HEAD` and return to step 2. R
 
 ## 6. Hand off
 
-Convergence means the diffs stopped producing findings, not that the design is right: a loop that reviews only diffs can converge on a series of local patches. So when the ledger holds any `confirmed` or `decision` finding, give one fresh-context subagent the branch diff command, the ledger and this question:
+Convergence means the diffs stopped producing findings, not that the design is right: a loop that reviews only diffs can converge on a series of local patches. So when the ledger holds any `confirmed` or `decision` finding, give one fresh-context subagent the branch diff command, the ledger, the inventory if there is one, and the **owner question**:
 
-> Which single reshape, if it had existed before this branch, would have prevented the most findings in this ledger? Name the ledger ids it would have prevented and the code it would retire, with file:line. "None" is a valid answer.
+> Name the concept these findings share. If they land on several, take each concept that two or more findings land on. For each concept, list every place in the codebase that decides it today, inside the diff or not, with file:line and counts. Which single module should own it, and what would that retire: code, tests, prose and ledger findings? "None" is a valid answer.
 
 Add its answer to the decision items unless it repeats one already there.
 
@@ -113,9 +116,11 @@ Before reporting, run the full set of checks from step 1. CI failures after the 
 
 Report:
 
-1. **Needs your decision**: each `decision` and `unverified` item, and the step-back reshape, with the options, the evidence and your recommendation. This is the main output, so put it first.
+1. **Needs your decision**: each `decision` and `unverified` item, and the owner answer, with the options, the evidence and your recommendation. This is the main output, so put it first.
 
    When the root-cause fix addresses the branch's purpose, recommend doing it in this branch. Recommend a follow-up only for work outside the purpose. Never recommend a guard as the interim fix for an invariant a reshape would make true by construction. Per address-review, guards written now are the reason the reshape never happens.
+
+   A reshape the user chooses goes through [`/design-first`](../design-first/SKILL.md) with them before anyone implements it, with the owner answer and the inventory as its premise. The design's first question is which module owns the concept. Brief an implementer only after the user approves the note.
 2. **Fixed**: one line per root-cause group, with its commit.
 3. **Rejected**: one line each, with the evidence. This keeps you from re-litigating them.
 4. **Follow-ups**: pre-existing problems, left unfixed.
