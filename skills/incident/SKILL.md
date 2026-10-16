@@ -1,6 +1,6 @@
 ---
 name: incident
-description: incident.io assistant for working with incidents. View incident details, post updates to incident channels, interact with the incident agent, and query structured incident data. Use whenever the user mentions an incident ID (e.g., "INC-123"), asks about an incident, or uses the /incident command. Trigger proactively when you see an incident reference.
+description: incident.io assistant for working with incidents. View incident details, post updates to incident channels, ask the incident.io agent, and query structured incident data. Use whenever the user mentions an incident ID (e.g., "INC-123"), asks about an incident, or uses the /incident command. Trigger proactively when you see an incident reference.
 allowed-tools:
   - Read
 ---
@@ -31,7 +31,7 @@ reference — don't wait for explicit requests.
 When this skill activates, follow this decision tree:
 
 1. **User provides an incident ID** (e.g., "INC-123")
-   → Use `incident_pin` tool, then use `ask_incident` to get a summary
+   → Use `incident_pin` tool, then use `ask` with `incident_id` to get a summary
    of the incident
 
 2. **User says "my incident", "the incident", "pinned incident", or is
@@ -44,7 +44,7 @@ When this skill activates, follow this decision tree:
    → Use `escalations_list` tool to list relevant incidents
    → Present brief options, let user choose, then pin
 
-**After pinning**: Use `ask_incident` to get a summary of the incident,
+**After pinning**: Use `ask` with `incident_id` to get a summary of the incident,
 or use the data tools to query specific details.
 
 ## Multi-select Interactions
@@ -104,13 +104,14 @@ for incident, alert, and escalation analysis using the stats tools.
 
 These tools connect to incident.io's backend agents:
 
-- `ask` — Ask the general AI agent a question (org queries, catalog, on-call,
-  schedule management including overrides)
-- `ask_incident` — Ask the incident AI agent about a specific incident (post
-  updates, change status, create actions, draft communications)
+- `ask` — Ask the incident.io AI agent a question (org queries, catalog,
+  on-call, schedule management including overrides). Pass `incident_id` to
+  focus it on a specific incident and let it act on it (post updates, change
+  status/severity, create actions and follow-ups, draft communications)
 
-Use `ask_incident` when you need to take actions only the incident agent can
-perform. Use `incident_message` when sharing information you've already analyzed.
+There is one `ask` tool backed by one agent. Use `ask` with `incident_id` when
+you need to take actions on an incident. Use `incident_message` when sharing
+information you've already analyzed.
 
 For structured data (counts, filtering, specific fields), prefer the data
 tools above — they're faster and cheaper than the agent tools. Use agent
@@ -118,7 +119,7 @@ tools when you need AI reasoning, entity resolution, or multi-step actions.
 
 ### Session management for agent tools
 
-Both agent tools (`ask`, `ask_incident`) support multi-turn conversations.
+The `ask` tool supports multi-turn conversations.
 Each response is a JSON object containing `session_id`, `response`,
 `outcome`, and optionally `image_urls`.
 
@@ -167,7 +168,7 @@ incident_pin(unset=true)               // Clear
 
 ### Step 3: Get incident details
 
-Use `ask_incident` to get a summary of what's happening, or use
+Use `ask` with `incident_id` to get a summary of what's happening, or use
 `incident_show` to get structured incident data.
 
 ### Step 4: Help the user
@@ -275,8 +276,9 @@ When the user says **"@incident [request]"**, this activates the incident.io too
 Route to the appropriate agent based on the question type:
 
 - **Incident actions** (status, severity, roles, updates, follow-ups) →
-  `ask_incident`
-- **Organisation queries** (on-call, catalog, schedules) → `ask`
+  `ask` with `incident_id`
+- **Organisation queries** (on-call, catalog, schedules) → `ask` without
+  `incident_id`
 
 ### Expanding requests
 
@@ -317,22 +319,22 @@ commit ff35f9c that replaces the O(n^2) truncation loop with a
 single-pass truncateToWidth approach."
 ```
 
-This applies to both agent tools. A few more examples:
+This applies to every `ask` call. A few more examples:
 
 - `@incident send an update` → Summarize what you found and did in your
-  session, pass that as the question to `ask_incident`
+  session, pass that as the question to `ask` with `incident_id`
 - `@incident who is on-call for platform?` → Route to `ask`
 - `@incident change status to resolved` → Verify it's appropriate, then
-  use `ask_incident`
+  use `ask` with `incident_id`
 
 ## Handling Suggestions
 
 **Requesting suggestions:** When the user asks to "suggest" something (e.g.,
-"suggest an incident update", "suggest a summary"), use `ask_incident` to
-request it. Don't generate suggestions locally — the backend agent has the
+"suggest an incident update", "suggest a summary"), use `ask` with
+`incident_id` to request it. Don't generate suggestions locally — the backend agent has the
 context and tools to create proper suggestions.
 
-**Processing suggestions:** The `ask_incident` response JSON may include a
+**Processing suggestions:** The `ask` response JSON may include a
 `suggestion` field. If present, always present it to the user for approval
 before actioning.
 
@@ -372,7 +374,7 @@ action it.
 
 **Step 3: Action the suggestion**
 
-Send a follow-up `ask_incident` call using the same `session_id`, with a
+Send a follow-up `ask` call using the same `session_id`, with a
 message like:
 
 - "accept suggestion 01HXYZ123ABC456DEF"
@@ -385,9 +387,10 @@ message like:
 what went wrong, draft updates.
 
 **Backend agents**:
-- `ask_incident` — Post official incident updates, change status/severity,
-  create actions/follow-ups, assign roles.
-- `ask` — Answer organisation-level questions (on-call, catalog, schedules).
+- `ask` with `incident_id` — Post official incident updates, change
+  status/severity, create actions/follow-ups, assign roles.
+- `ask` without `incident_id` — Answer organisation-level questions (on-call,
+  catalog, schedules).
 
 **Use `incident_message`** for sharing your own analysis. **Use the agent
 tools** for actions and queries only the backend can perform.
@@ -429,7 +432,7 @@ automatically. Use `incident_pin()` to get the current incident ID.
 2. incident_pin() → Check currently pinned incident, OR
    escalations_list → Find incidents you were paged for
 3. incident_pin(incident_id="INC-12345") → Set as active
-4. ask_incident(incident_id="INC-12345", question="Summarise this incident") → Get details
+4. ask(incident_id="INC-12345", question="Summarise this incident") → Get details
 5. incident_message(INC-12345, "I've reviewed...") → Post update
 ```
 
@@ -439,4 +442,4 @@ automatically. Use `incident_pin()` to get the current incident ID.
   the incident.io macOS app
 - **404 Not Found:** Verify the incident ID exists
 - **Backend MCP unavailable:** Local tools still work; backend tools like
-  `ask_incident` require connectivity
+  `ask` require connectivity
