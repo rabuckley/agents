@@ -21,9 +21,13 @@ Classes internal to a project should be `internal`; `public` members inside an i
 
 Avoid the `DTO` suffix. Use `Request`, `Summary` for list items, and `Details` for get-by-id. CQRS commands and handlers are suffixed `Command` and `CommandHandler`.
 
-### Public XML documentation
+### XML documentation
 
-Document every public API with triple-slash comments, following the BCL, `Microsoft.Extensions.*`, and ASP.NET Core. The house style has fixed wording for summaries, boolean params and returns, `out` and `ref` params, task returns, enum values, exception conditions, and crefs, and it is easy to get subtly wrong: read the `csharp-xml-docs` skill before writing or editing a `///` block.
+Use triple-slash comments for domain models, API DTOs consumed by generated clients, and the supported public surface of libraries. Cover the types and relevant members, including properties and enum values, with domain meaning and consumer contracts. Internal domain models are included; persistence-only records are not included merely because they store domain data. Public accessibility alone does not make application or test code a supported library surface.
+
+For other code, including test classes, fixtures and helpers shared between test projects, write comments where they explain non-obvious intent, constraints or trade-offs that a maintainer needs to preserve.
+
+Read the `csharp-xml-docs` skill before writing or editing a `///` block. It defines the house style; contract accuracy takes precedence over wording templates.
 
 ### Testing
 
