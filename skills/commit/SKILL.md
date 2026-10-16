@@ -35,4 +35,6 @@ Git rejects `-F` with any `--fixup`, and `-m` with `--fixup=amend:`. Without an 
 
 State only reasons you know. Keep the title under 72 characters, ideally nearer 50, and wrap the body at 72.
 
+Apply [unslop](../unslop/SKILL.md) to the commit message.
+
 Where the log above shows no settled convention, use a conventional commit title.
