@@ -35,7 +35,7 @@ Rationale stays when it prevents a plausible mistake or explains a constraint.
 
 **Delete** a passage when it restates the code, repeats a nearby passage, or is filler.
 
-**Condense** a passage when it is useful but padded. Keep the examples, context and qualifications a reader needs to act correctly. Match the repository's conventions and do not restyle text you are not otherwise changing.
+**Condense** a passage when it is useful but padded. Keep the examples, context and qualifications a reader needs to act correctly. Match the repository's format and terminology, not its verbosity, and do not restyle text you are not otherwise changing.
 
 **Fix** a passage when it is inaccurate. Before rewriting, check every consequential claim against the implementation, tests and any referenced contract. Where code and docs disagree, work out which is wrong. Do not document a bug as intended behaviour. If you cannot find evidence either way, leave the passage and note what evidence is missing.
 

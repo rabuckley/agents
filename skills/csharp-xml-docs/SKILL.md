@@ -10,7 +10,7 @@ The project's documentation rules decide which APIs need triple-slash comments; 
 
 Describe the intended contract and verify that the implementation supports it. Report discrepancies; incidental implementation behavior is not a guarantee. Include units, bounds, defaults, null and empty semantics, ordering, ownership, and failures where they matter to correct use. Contract accuracy takes precedence over wording templates.
 
-Follow the BCL, `Microsoft.Extensions.*`, and ASP.NET Core style. The [dotnet-api-docs wiki](https://github.com/dotnet/dotnet-api-docs/wiki) provides further guidance; the cancellation-token and task-return conventions below are deliberate house departures.
+Follow the BCL, `Microsoft.Extensions.*`, and ASP.NET Core style. The [dotnet-api-docs wiki](https://github.com/dotnet/dotnet-api-docs/wiki) provides further guidance; the cancellation-token and task-return conventions below are deliberate house departures. Take layout and wording templates from neighbouring docs, not their length: extra remarks or restated implementation nearby are not a convention to copy.
 
 Tag order is `summary`, `typeparam`, `param`, `returns` (or `value` for a property), `exception`, `remarks`, `example`, `seealso`. Put opening and closing tags on their own lines, except for the empty cancellation-token tag below. Preserve an existing single-line `/// <summary>...</summary>` style when the complete comment line fits within the project's line-length guidelines.
 

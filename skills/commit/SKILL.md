@@ -37,4 +37,4 @@ State only reasons you know. Keep the title under 72 characters, ideally nearer 
 
 Apply [unslop](../unslop/SKILL.md) to the commit message.
 
-Where the log above shows no settled convention, use a conventional commit title.
+Where the log above shows no settled convention, use a conventional commit title. Take the title format from the log, not the body length: long bodies in recent commits are not a reason to write one.

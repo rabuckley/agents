@@ -9,7 +9,8 @@ paths:
 
 Write code that reads like the code around it. The rules below are the house
 preferences a project's own files won't tell you; where a project consistently
-deviates from one, match the project.
+deviates from one, match the project. Matching covers idiom and format, not
+comment volume; comments follow the rules below however wordy their neighbours.
 
 - Use `is` over `==` for null and constant checks, and `is { }` where it reads better than a null test.
 - Declare constructors in the type body rather than as primary constructors.
