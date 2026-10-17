@@ -41,7 +41,7 @@ Separate uncertainty about usefulness from uncertainty about truth. Delete clear
 
 Put information where its reader looks. API documentation states the caller's contract; implementation comments explain the code being maintained. Reassess each sentence for the destination's reader before moving it; relocation cannot rescue a sentence that fails the destination's standard. Keep comment moves within the same file when that improves their context. If useful material belongs in broader documentation or another file, leave it in place and report the suggested destination.
 
-Before rewriting survivors, read and apply the writing rules in [unslop](../unslop/SKILL.md). Write in the present tense. Match the file's comment format and the documentation convention's wording templates, applied consistently across a type's members. Don't match the file's density: wordy neighbouring comments are not a standard, and copying them carries the verbosity into new code. A kept block should not end longer than it started.
+Before rewriting survivors, read and apply the writing rules in [unslop](../unslop/SKILL.md). Write in the present tense. Match the file's comment format and apply documentation conventions consistently across a type's members. The documentation's audience and published output take precedence over language-specific wording templates. Don't match the file's density: wordy neighbouring comments are not a standard, and copying them carries the verbosity into new code. A kept block should not end longer than it started.
 
 ## Verify and report
 
