@@ -29,7 +29,17 @@ Each commit should be one logical change.
 
 When a change corrects something an unpushed commit on this branch introduced, commit it as a fixup of that commit, so the history never contradicts itself: `git commit --fixup=<sha>`, or `--fixup=amend:<sha>` with a corrected message when the change makes that commit's message wrong. To fold fixups in, run `GIT_SEQUENCE_EDITOR=: GIT_EDITOR=true git rebase -i --autosquash <base>` yourself once the user wants history tidied, after creating a backup branch. Offer `/restructure-commits` when the fixups need regrouping.
 
-Git rejects `-F` with any `--fixup`, and `-m` with `--fixup=amend:`. Without an editor, write the corrected message by running `git commit --fixup=amend:<sha> --no-edit`, then `git commit --amend -F <file>` where the file's first line stays `amend! <original subject>` and the rest is the full replacement message.
+Git rejects `-F` with any `--fixup`, and `-m` with `--fixup=amend:`. Without an editor, run `git commit --fixup=amend:<sha> --no-edit`, then `git commit --amend -F <file>`. The file must contain the `amend!` marker, a blank line, then the complete replacement message starting with its own subject:
+
+```text
+amend! feat(x): old subject
+
+feat(x): new or same subject
+
+Body…
+```
+
+Autosquash removes the marker paragraph; the replacement subject must appear below it even when unchanged.
 
 ## Message
 

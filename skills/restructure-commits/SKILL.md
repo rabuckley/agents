@@ -17,6 +17,7 @@ Rework an unmerged branch's commits so each is one logical change — however ma
 5. **Verify**:
    - Invariant: `git diff <backup> HEAD` shows exactly the approved content changes — usually nothing. Anything else means the rebuild lost or invented content — find out which.
    - Check `git range-diff <base>..<backup> <base>..HEAD` against the designed mapping.
+   - Subjects: run `git log --format=%s <base>..HEAD | grep -vE '<repo-subject-pattern>'`, using the repo's anchored Conventional Commits pattern (or its established subject convention). Also run `git log --format=%s <base>..HEAD | grep -E '^(amend!|fixup!|squash!)'`. Both must produce no output (`grep` exits 1 for no matches); repair any reported subjects before finishing. The tree check cannot detect message corruption.
    - Bisectability: where the history will be bisected, verify each commit builds and passes as far as is affordable, and name what went unverified.
    - Leave the backup in place; give the user the command to drop it.
 
