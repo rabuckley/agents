@@ -10,6 +10,8 @@ Edit text to remove AI patterns. Scan for the patterns below, then rewrite. Pres
 
 Hold short, formatted text to every rule, not just the vocabulary list: commit subjects, headings, captions, and doc comments. Their fixed shape makes them look finished, so tells survive there.
 
+To apply fixes to commits that already exist, follow the backup, mechanics, and verify steps in [`../restructure-commits/SKILL.md`](../restructure-commits/SKILL.md). To reword one commit, follow its `pick` line in the todo with `exec git commit --amend -F <msg-file>`.
+
 ## Patterns to detect and fix
 
 Rule numbers are stable ids that other skills cite. A removed rule leaves a gap.
