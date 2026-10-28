@@ -45,6 +45,8 @@ Autosquash removes the marker paragraph; the replacement subject must appear bel
 
 State only reasons you know. Keep the title under 72 characters, ideally nearer 50, and wrap the body at 72.
 
-Apply [unslop](../unslop/SKILL.md) to the commit message.
+Apply [unslop](../unslop/SKILL.md) to the commit message, subject included.
+
+For an internal API, the subject names the API and what it now takes or returns.
 
 Where the log above shows no settled convention, use a conventional commit title. Take the title format from the log, not the body length: long bodies in recent commits are not a reason to write one.
