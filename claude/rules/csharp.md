@@ -27,9 +27,7 @@ Avoid the `DTO` suffix. Use `Request`, `Summary` for list items, and `Details` f
 
 ### XML documentation
 
-Use triple-slash comments for domain models, API DTOs consumed by generated clients, and the supported public surface of libraries. Cover the types and relevant members, including properties and enum values, with domain meaning and consumer contracts. Internal domain models are included; persistence-only records are not included merely because they store domain data. Public accessibility alone does not make application or test code a supported library surface.
-
-For other code, including test classes, fixtures and helpers shared between test projects, write comments where they explain non-obvious intent, constraints or trade-offs that a maintainer needs to preserve.
+Write comments for coverage only where an analyzer, lint or documentation build enforces it, and keep those concise. Before writing one to explain what a type or member is, improve its name; add a triple-slash comment only when the name and type still leave a reader able to misuse or misread it, such as a unit, a valid range, what `null` means or a side effect. On domain models, API DTOs and library surface, document that contract; elsewhere, including tests, comment only on non-obvious intent, constraints or trade-offs that a maintainer needs to preserve.
 
 Read the `csharp-xml-docs` skill before writing or editing a `///` block. It defines the house style; contract accuracy takes precedence over wording templates.
 
