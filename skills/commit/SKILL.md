@@ -13,11 +13,11 @@ Status:
 
 Recent subjects, for the repo's conventions:
 
-!`git log -10 --no-merges --format=%s`
+!`git log -10 --no-merges --format=%s --ignore-missing HEAD`
 
 The latest two in full:
 
-!`git log -2 --no-merges --format=%n%B`
+!`git log -2 --no-merges --format=%n%B --ignore-missing HEAD`
 
 ## What goes in
 
