@@ -1,104 +1,55 @@
 ---
 name: csharp-xml-docs
 description: >
-  The BCL and dotnet-api-docs house style for C# XML doc comments. Use when
-  writing or editing a triple-slash `///` block, choosing the wording for a
-  summary, param, returns, exception, or cref, or checking existing XML docs.
+  House style for C# XML doc comments: how much to write, and where the style
+  departs from BCL conventions. Use when writing, editing or reviewing a
+  triple-slash `///` block.
 ---
 
-The project's documentation rules decide which APIs need triple-slash comments; this skill explains how to write them. In this repository, scope is defined in [the C# rule](../../claude/rules/csharp.md#xml-documentation).
+The project's rules decide which members get a `///` comment. This skill covers what goes in one.
 
-Describe the intended contract and verify that the implementation supports it. Report discrepancies; incidental implementation behavior is not a guarantee. Include units, bounds, defaults, null and empty semantics, ordering, ownership, and failures where they matter to correct use. Contract accuracy takes precedence over wording templates.
+## How much to write
 
-Choose wording for the audience and published output. For wire contracts and API DTOs whose XML documentation feeds OpenAPI or generated clients, write language-neutral descriptions of fields and their observable semantics. Prefer "The concurrency token to send with edits." over "Gets or initializes the concurrency token." Use XML markup and C# symbol references where the publishing pipeline renders them usefully. This audience rule takes precedence over the wording and cross-reference templates below.
+Write the least that lets a caller use the member correctly. Callers read the comment in a tooltip beside the signature, so repeating the name and types gives them nothing.
 
-For APIs consumed primarily as .NET libraries, follow the BCL, `Microsoft.Extensions.*`, and ASP.NET Core style. The [dotnet-api-docs wiki](https://github.com/dotnet/dotnet-api-docs/wiki) provides further guidance; the cancellation-token and task-return conventions below are deliberate house departures. Take layout and wording templates from neighbouring docs, not their length: extra remarks or restated implementation nearby are not a convention to copy.
+A one-sentence `<summary>` is a complete comment. Add another tag only for a fact the signature does not show: a unit, a range, a default, what `null` or empty means, who owns a resource, an exception the caller should handle. Where it fits, state the fact in the summary with `<paramref>` instead. The compiler warns when only some parameters have tags (CS1573), so tag all of them or none.
 
-Tag order is `summary`, `typeparam`, `param`, `returns` (or `value` for a property), `exception`, `remarks`, `example`, `seealso`. Put opening and closing tags on their own lines, except for the empty cancellation-token tag below. Preserve an existing single-line `/// <summary>...</summary>` style when the complete comment line fits within the project's line-length guidelines.
+Keep what a caller needs in the summary, because tooltips show the summary and not `<remarks>`. Use `<remarks>` for detail a caller can do without.
 
-## Summaries
+Don't document an exception the signature implies, such as `ArgumentNullException` for a non-nullable parameter.
 
-Use one concise sentence ending in a period. Avoid unnecessary signature repetition; use `<paramref>` when referring to a parameter makes the contract clearer.
+State the contract: what the member is meant to guarantee, and what implementers must uphold. Leave out how it works and why it was designed that way. A reason a maintainer needs goes in a `//` comment beside the code. Behaviour the code happens to have, such as a sort order, is not a guarantee. If the code breaks the intended contract, report it rather than documenting the bug.
 
-- Methods: present tense, third person, describing the operation rather than restating its name. Lead with `Asynchronously <verb>` when the operation is asynchronous; a name or return type alone does not establish this.
-- Types: describe the concept or role, usually `Represents <concept>.` or `Provides <capability>.` Exception types use `The exception that is thrown when <condition>.`
-- Constructors: `Initializes a new instance of the <see cref="TypeName"/> class.` Adapt the kind for a struct and add distinguishing initialization behavior when needed.
-- Properties: match the accessors with `Gets`, `Gets or sets`, or `Gets or initializes`. Boolean properties use the matching prefix followed by `a value that indicates whether <condition>.`
+Copy layout from neighbouring comments, not their length.
 
-## Parameters and returns
+## Style
 
-Prefer a noun phrase with a leading article and a period; let `cref` carry a type reference: `<param name="services">The <see cref="IServiceCollection"/> to add the service to.</param>`. Keep meaningful semantics even when they need a different sentence shape.
+Word comments as the BCL does, with these exceptions:
 
-Every parameter keeps its tag. A `cancellationToken` leaves its tag empty, `<param name="cancellationToken"></param>`, unless cancellation has member-specific semantics worth documenting. Explain effects such as partial work or rollback when they matter to correct use; the token's name cannot convey them.
+- **Layout.** Put opening and closing tags on their own lines. Keep an existing single-line `/// <summary>...</summary>` when it fits the line length.
+- **Cancellation tokens.** In a full set of `<param>` tags, leave this one empty, `<param name="cancellationToken"></param>`, unless cancelling does something a caller must know, such as leaving partial work.
+- **Tasks.** For `Task<T>` and `ValueTask<T>`, `<returns>` describes the value, not the task: `A URL with read permission for the file.` `Task` and `ValueTask` take no `<returns>`.
+- **Wire contracts.** Where the comment feeds OpenAPI or a generated client, describe the field for a reader who doesn't know C#: `The concurrency token to send with edits.`, not `Gets or initializes the concurrency token.`
 
-For `Task<T>` and `ValueTask<T>`, `<returns>` describes the resulting value, such as `A URL with read permission for the file.`, rather than the task carrying it. Non-generic `Task` and `ValueTask` take no `<returns>` tag; describe meaningful completion guarantees in the summary or remarks.
+Use `<inheritdoc/>` on an override or implementation whose contract matches its base.
 
-Booleans read by direction:
+## Examples
 
-- Parameter: `true to <effect>; otherwise, false.`
-- Return value or `<value>`: `true if <condition>; otherwise, false.`
-
-Use `<see langword="true"/>` and `<see langword="false"/>` in XML. Use the two-clause `true if X; false if Y` only when the false case needs stating.
-
-Other shapes depend on the actual behavior:
-
-- `out`: `When this method returns, contains <description>.` For `Try…` methods, describe the value on both success and failure.
-- `ref`: describe the incoming value and how the method may change it; repeating `passed by reference` adds no contract.
-- Flag enum: `A bitwise combination of the enumeration values that <...>.` A plain enum takes `One of the enumeration values that <...>.`, or just the clause when clearer, such as `How the browser presents the file.`
-- `<value>` with a default: add `The default is <X>.`
-- Fluent return: use `A reference to this instance after the operation has completed.` only when the returned object is guaranteed to be the same instance.
-
-## Exceptions
-
-Document exceptions thrown directly by the member and known propagated exceptions relevant to callers, with explicit conditions. Inspect relevant calls to identify likely failures; do not turn every incidental dependency failure into a supported guarantee. This follows the bounded priorities in the [upstream exceptions guidance](https://github.com/dotnet/dotnet-api-docs/wiki/Exceptions).
-
-Write each condition as a bare clause reading as though "if" preceded it:
-
-```xml
-<exception cref="ArgumentNullException">
-<paramref name="json"/> is <see langword="null"/>.
-</exception>
-```
-
-Separate multiple conditions for one exception type with `-or-` in its own `<para>`. Use `<para>` for paragraph separation; blank `///` lines do not establish paragraphs.
-
-For members that always throw, use `Throws a <see cref="ExceptionType"/> exception in all cases.` as the summary and `In all cases.` as the exception condition. Use `This method doesn't return a value.` in `<returns>` only when the declaration has a return value and the return conventions above call for the tag.
-
-Verify whether each exception is thrown synchronously or delivered through the returned awaitable; an `Async` suffix does not establish this. For a `Task` that stores the exception, append `This exception is stored into the returned task.` For `ValueTask`, describe delivery when awaited without assuming a backing `Task`.
-
-For lazy results such as `IEnumerable<T>` and `IAsyncEnumerable<T>`, document when work and failures occur, whether repeated enumeration repeats work, and resource ownership where these affect correct use. Distinguish call-time, await-time, and enumeration-time failures.
-
-## Cross-references and inheritance
-
-Use `<see cref=""/>` for type and member references, with `{}` for generics (`<see cref="Contains{T}(ReadOnlySpan{T}, T)"/>`). Qualify references as needed to resolve the intended symbol. Use `<paramref>` and `<typeparamref>` for parameters, `<see langword=""/>` for language keywords, and `<c>` for values or fragments with no symbol behind them, such as `<c>-1</c>` or `<c>index + count</c>`. Named constants such as `int.MaxValue` take a `cref`. See the [C# XML documentation reference](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/xmldoc/recommended-tags).
-
-Use `<inheritdoc/>` for overrides and interface implementations with the same contract; use an explicit `cref` when the source needs identifying. Inherit across overloads only when parameter meanings, results, and failure behavior match, and verify parameter mapping in the generator. Add or replace documentation for contract differences. Verify that the documentation generator expands inheritance in the distributed output: IDE inheritance alone does not populate the compiler's XML documentation. See the [inheritance guidance](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/xmldoc/recommended-tags#inheritdoc).
-
-## Remarks
-
-Use remarks for supplemental contract details, including obligations for interface implementers and derived classes. Keep essential calling information in `summary`, `param`, or `returns`. Type-level remarks describe shared guarantees without repeating member contracts.
-
-Document “Disposing the writer leaves the stream open.” Remove “so callers don’t need a wrapper to reuse the stream.” Preserve necessary maintainer reasoning beside the implementation.
-
-## Examples and final check
-
-Both `Try…` outcomes, null semantics, and a precise parameter reference:
+A summary that earns its place by naming a side effect, with no other tags:
 
 ```csharp
 /// <summary>
-/// Attempts to read a port number from <paramref name="text"/>.
+/// Asynchronously deletes the file, including versions still under retention.
 /// </summary>
-/// <param name="text">
-/// The decimal text to parse; <see langword="null"/> or empty text is invalid.
-/// </param>
-/// <param name="port">
-/// When this method returns, contains the port number from 1 through 65535 on success,
-/// or zero on failure.
-/// </param>
-/// <returns>
-/// <see langword="true"/> if the text is a valid port number; otherwise, <see langword="false"/>.
-/// </returns>
-public bool TryReadPort(string? text, out int port);
+public Task DeleteAsync(FileId id, CancellationToken cancellationToken);
 ```
 
-Before finishing, check that the XML is well formed, parameter and type-parameter names match the declaration, references resolve, and every promise reflects the intended contract and is supported by the implementation. Use the project's documentation build to check compiler diagnostics and generated output, including inherited documentation, where available.
+A wire-contract field:
+
+```csharp
+/// <summary>
+/// The delay before dispatch, in seconds. <see langword="null"/> schedules automatically
+/// and zero dispatches immediately.
+/// </summary>
+public int? Delay { get; init; }
+```

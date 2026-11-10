@@ -27,9 +27,9 @@ Avoid the `DTO` suffix. Use `Request`, `Summary` for list items, and `Details` f
 
 ### XML documentation
 
-Write comments for coverage only where an analyzer, lint or documentation build enforces it, and keep those concise. Before writing one to explain what a type or member is, improve its name; add a triple-slash comment only when the name and type still leave a reader able to misuse or misread it, such as a unit, a valid range, what `null` means or a side effect. On domain models, API DTOs and library surface, document that contract; elsewhere, including tests, comment only on non-obvious intent, constraints or trade-offs that a maintainer needs to preserve.
+Most types and members need no `///` comment. Add one only when the name and types still let a caller misuse or misread the member: a unit, a valid range, what `null` means, a side effect. Improve the name first if that would do. Public visibility alone is no reason to add one. Where an analyzer or documentation build requires a comment, write a one-sentence summary. Put intent, constraints and trade-offs a maintainer must preserve in a `//` comment beside the code.
 
-Read the `csharp-xml-docs` skill before writing or editing a `///` block. It defines the house style; contract accuracy takes precedence over wording templates.
+Read the `csharp-xml-docs` skill before writing or editing a `///` block.
 
 ### Testing
 
