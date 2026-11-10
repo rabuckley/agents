@@ -5,54 +5,50 @@ disable-model-invocation: true
 argument-hint: "[base-ref] [paths...]"
 ---
 
-Leave readers with the information they need to use or change the code correctly. Prefer deleting repetition to polishing it; brevity alone is not the objective. Edit comments only, not code.
+Leave readers the information they need to use or change the code correctly, and nothing else. Edit comments only, not code. Don't commit.
 
 ## Scope
 
-Use an explicit base ref when supplied. Otherwise, resolve the repository's default branch from its remote HEAD or repository metadata, using the locally available tracking ref. If it cannot be resolved, ask for a base ref rather than guessing `main` or `master`. If the ref or its merge-base with `HEAD` is unavailable, report that and ask for a usable ref.
+Compare the working tree with its merge-base against the base ref, so the scope covers committed, staged, unstaged and untracked changes. Use the base ref when one is given. Otherwise use the repository's default branch, read from the remote rather than assumed to be `main`. If no base resolves, ask for one. Paths narrow the scope; they do not replace the base.
 
-Compare the working tree with that merge-base: include committed branch changes, staged changes and unstaged changes, plus untracked source files. Paths restrict this scope; they do not replace the baseline. Report the resolved base and any path restriction.
+Review every comment that has an added or changed line, including its untouched sentences, and every existing comment that the changed code made false. Leave tool directives (lint suppressions, pragmas, build tags), generated comments and licence headers alone.
 
-Review every complete comment block containing an added or changed line, including untouched sentences within that block, plus existing comments the scoped code changes made false. Leave tool directives (lint suppressions, pragmas, build tags), generated comments and licence headers alone. Read beyond the scope as needed for evidence; avoid turning the cleanup into a wider documentation audit.
+## Decide what stays
 
-## Decide what earns its place
+Delete by default. A sentence stays only when it passes the test for its readers; being accurate is not enough. When a comment has a line that needs fixing, first ask whether the comment should exist.
 
-Before deleting doc comments or required tags, check repository guidance and the effective linter, analyzer, compiler and documentation-build configuration, including visibility rules and test exemptions. Required comments are candidates for rewording and tightening; preserve the required coverage and tags, not the existing wording. When the usefulness tests would otherwise delete a required comment, rewrite it as concise, accurate documentation that satisfies the requirement. Preserve the enforcing rules and suppressions.
+Readers choose the test, not visibility. Documentation is for callers only when callers outside the feature read it. When every caller sits in the same feature, the readers are that feature's maintainers, even if the member is public. Comments in tests, doc comments included, are for maintainers.
 
-Deletion is the default for optional prose. A sentence stays only when you can name the mistake it prevents or the caller need it serves; being accurate does not earn it a place.
+**Maintainers.** Name the mistake a competent maintainer would plausibly make without the sentence: remove a workaround, undo a trade-off, break an invariant, or misread dense code. Before you judge, search for a test that asserts the behaviour the comment describes; a test that only runs the code does not count. A test that fails on the mistake already prevents it, so keep the comment only when the test's name and failure would not tell a maintainer whether to fix the code or change the test.
 
-Before deciding any fate, find the tests for each in-scope implementation comment: search for tests that exercise the behaviour it describes and read their assertions. A test counts only when it asserts that behaviour; one that merely executes the code does not. This step is done when every implementation block has a named test or "no test".
+An argument that the design is sound does not name a mistake. "Approving and authoring are separate grants" defends the design. "A separate role, so the editor role never grants publishing" says what breaks if someone merges the roles. Keep only the second.
 
-Decide each in-scope block's fate before editing any of it: delete it, keep it, or keep parts. Apply the usefulness tests below first, subject to documentation requirements, and verify claims in the prose you retain or rewrite. When a block has a line that needs fixing, start by asking whether the block should exist at all.
+In tests, the names, setup and assertions already state the behaviour. Keep what they cannot show: shared state, an ordering or isolation constraint, or why the setup differs from the obvious one.
 
-For implementation comments, identify the concrete mistake a competent maintainer could plausibly make without the sentence: remove a deliberate workaround, undo a trade-off, break an invariant, or misread unavoidably dense code. Names, types and assertions may enforce what must hold without explaining why it matters; retain rationale only when it prevents a maintainer from removing or weakening that enforcement. A test raises the bar further: when it fails on the mistake, the failure already prevents it. Keep a comment on tested behaviour only when the test's name and failure would leave a maintainer unable to tell whether to fix the code or change the test. Cut restatements, obvious reasons, summaries of clear code, change narration and remarks addressed to the reviewer. Keep a relationship claim such as "mirrors X" only when it explains a dependency the reader needs to preserve and what breaks if it changes.
+Keep an issue or PR number only when it points to an open constraint the reader must follow up.
 
-An argument that the design is sound is not rationale. "Approving and authoring are separate grants" defends the design. "A separate role, so the editor role never grants publishing" names what a maintainer would break by merging the roles. Keep only that clause.
+**Callers.** Keep a sentence only when it helps a caller use the API correctly: valid inputs, the meaning of results, side effects, failures. A fact that types or tests already show stays when the caller would otherwise have to read the implementation or the tests to learn it. Internal rationale, change history and one caller's purpose are not part of the contract.
 
-Classify documentation by its readers, not its visibility. Treat it as API documentation only when callers outside the feature read it. When every caller of a type or member sits in the same feature, its readers are that feature's maintainers: apply the implementation test, even when it is exported or public.
+**Required comments.** Before you delete a doc comment or tag, check whether repository guidance or the linter, analyzer, compiler or documentation build requires it, including visibility rules and test exemptions. Rewrite a required comment that fails its test as short, accurate documentation instead of deleting it. Leave the rules and their suppressions unchanged.
 
-For API documentation, retain a sentence only when it helps callers use the API correctly: understand valid inputs, interpret results, account for side effects or handle failures. Keep a contract fact already visible in types or tests only when a caller would otherwise have to read the implementation or tests to learn it. Apply this caller-use test independently: rejecting an implementation comment does not make it API documentation. Internal rationale, change history and a particular caller's purpose do not belong in the contract merely because they have nowhere else to go. Cut redundant or irrelevant prose beyond the required minimum.
+## Check claims
 
-Doc comments in tests, including summaries on public test classes and fixtures, are implementation comments. Their readers are maintainers. Test names, arrange code and assertions already state the behaviour and the setup, so a summary that lists them repeats the code. Beyond the required minimum, keep only what a maintainer can't see in the code: shared state that tests must respect, a constraint on ordering or isolation, or why the setup differs from the obvious one.
+Check each claim you keep or rewrite against the code or another authoritative source. Correct a wrong claim only if the corrected sentence still passes its test; otherwise delete it. A correction that needs more words than the original usually means the sentence should go.
 
-Issue and PR numbers record history. Keep one only when it points to an open constraint or workaround that the reader needs to follow up.
+Failing to verify a claim does not make it false. Keep an unverified claim only when it may record an external constraint or workaround, leave its wording alone, and flag it in the recap.
 
-## Verify claims
+## Rewrite what stays
 
-Check stated reasons and claims about callers, queries, schemas, migrations, scripts or jobs against the relevant implementation or authoritative source. Plausibility is not evidence. Correct a wrong claim only if the corrected sentence still passes the usefulness test; otherwise delete it. Don't add caveats or detail to make a claim complete. A correction that needs more words than the original usually means the sentence should go.
+Read [unslop](../unslop/SKILL.md) before rewriting, and [csharp-xml-docs](../csharp-xml-docs/SKILL.md) before rewriting a `///` block.
 
-Separate uncertainty about usefulness from uncertainty about truth. Delete clear restatements. Investigate uncertain factual claims; missing evidence alone does not prove a claim false. When verification is unavailable, preserve the explanation only when it may record an important external constraint or workaround; don't strengthen it, and flag the claim as unverified in the recap. Record evidence locations for disputed or consequential claims; sentence-level scrutiny is an internal discipline, not a requirement to report every retained sentence.
+Match the file's comment format but not its length. Wordy neighbours are not a standard. Where documentation is published beyond the language, such as into an OpenAPI schema, word it for that reader rather than by the language's templates.
 
-## Place and rewrite survivors
+In doc comments, refer to symbols with the format's reference syntax, such as `<see cref>` or `{@link}`, because the tooling validates those links and renames keep them correct. Check that each reference resolves to the symbol you mean. Keep code formatting for literal values.
 
-Put information where its reader looks. API documentation states the caller's contract; implementation comments explain the code being maintained. Reassess each sentence for the destination's reader before moving it; relocation cannot rescue a sentence that fails the destination's standard. Keep comment moves within the same file when that improves their context. If useful material belongs in broader documentation or another file, leave it in place and report the suggested destination.
-
-Before rewriting survivors, read and apply the writing rules in [unslop](../unslop/SKILL.md). Write in the present tense. Match the file's comment format and apply documentation conventions consistently across a type's members. The documentation's audience and published output take precedence over language-specific wording templates. Don't match the file's density: wordy neighbouring comments are not a standard, and copying them carries the verbosity into new code. A kept block should not end longer than it started.
-
-In doc comments, refer to symbols through the language's structured reference syntax rather than plain text or code spans, because the documentation tooling resolves, validates and links those references, and renames keep them correct: `<see cref>`, `<paramref>` and `<see langword>` in C# XML docs, `{@link}` in Javadoc, JSDoc and TSDoc, intra-doc links in Rust, cross-reference roles such as `:class:` in Sphinx. Use the tag that matches the referent's kind, and keep code formatting for literal values and fragments with no symbol behind them. Each reference must resolve to the intended symbol; qualify it when it is ambiguous. Apply this to blocks already in scope; it is not a reason to widen the review. For C#, read [csharp-xml-docs](../csharp-xml-docs/SKILL.md) before rewriting a `///` block.
+Move a comment within its file when that puts it where its reader looks. Leave material that belongs in another file where it is, and report where it should go.
 
 ## Verify and report
 
-Review the final diff for lost contracts, rationale or caveats, unintended code changes and unnecessary scope. Run checks proportional to the edit: prose-only changes usually need diff inspection; when doc-comment coverage, required tags or structured references change, run the enforcing lint, analyzer, compiler or documentation check.
+Read the final diff for lost contracts or rationale and for code changes. If doc-comment coverage, required tags or symbol references changed, run the check that enforces them.
 
-Don't commit. Recap meaningful edits, unresolved consequential claims, and validation performed or blocked. For each in-scope block you kept, whole or in part, name in one line the mistake it prevents, the caller need it serves or the tooling requirement it satisfies. For a kept implementation comment, also name the test you found or "no test". Include evidence locations where they help assess a disputed or consequential claim.
+In the recap, give the resolved base and any path restriction, the meaningful edits, the claims left unverified, and the checks you ran or could not run. For each comment you kept, name in one line the mistake it prevents, the caller need it serves or the requirement it satisfies. For a maintainer comment, also name the test you found or "no test".
