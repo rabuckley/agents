@@ -9,7 +9,7 @@ description: >
   redundant test. Report only — no code changes. Use when the user wants tests
   reviewed or audited, asks whether tests are valuable, brittle, or redundant,
   or wants a test suite cleaned up. Do NOT use for writing tests (tdd),
-  reviewing production code (feature-code-review), or module structure
+  reviewing production code, or module structure
   (braid-review).
 argument-hint: "[path | git-ref | all]"
 disallowed-tools: Edit Write NotebookEdit
@@ -139,13 +139,14 @@ the reader.
 Output is a report only — leave the working tree as you found it; fixes
 happen on a separate, explicit request.
 
-Rank findings by the cost the suite carries, worst first. Each finding:
+Lead with the count and the single worst finding, then rank findings by the
+cost the suite carries, worst first. Each finding:
 
 ```
-N. file:line — [criterion] one-line claim
+N. file:line — [criterion name] one-line claim
    Evidence: <the criterion's artifact>
    Remedy: <the change — deletion is first-class>
 ```
 
-Close with the count and the single worst finding. "The suite holds — no
-findings" is a valid verdict; deliver it without padding nits or praise.
+"The suite holds — no findings" is a valid verdict; deliver it without padding
+nits or praise.
