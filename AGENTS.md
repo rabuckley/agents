@@ -11,7 +11,6 @@ Implementation comments you write say what the code cannot: the non-obvious "why
 
 ## Out-of-scope findings
 
-When you find a genuine bug or hazard outside the task:
+When you find a genuine bug or hazard outside the task, fix it only when it's entangled with your change: the fix shares its abstraction or migration, or leaving it would force the next change to undo yours. Otherwise report it.
 
-- **Fix it now** when it's entangled with your change: the fix shares its abstraction or migration, or leaving it would force the next change to undo yours. Call out every such fix in the recap.
-- **Report it** otherwise, or when the fix needs its own design decision, in the recap, with prominence matching its severity.
+In the recap, name every change the task didn't ask for, however small.
