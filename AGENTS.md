@@ -7,10 +7,4 @@ _Apply this guidance proportionally and within the task's scope. Where a codebas
 
 ### Comments
 
-Implementation comments you write say what the code cannot: the non-obvious "why" (intent, trade-offs, invariants), or a summary of unavoidably dense code.
-
-## Out-of-scope findings
-
-When you find a genuine bug or hazard outside the task, fix it only when it's entangled with your change: the fix shares its abstraction or migration, or leaving it would force the next change to undo yours. Otherwise report it.
-
-In the recap, name every change the task didn't ask for, however small.
+Implementation comments you write say only what the code cannot: the non-obvious "why" (intent, trade-offs, invariants), or a summary of unavoidably dense code.
