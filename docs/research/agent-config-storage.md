@@ -14,7 +14,8 @@ Researched 2026-10-12 against official docs and source. Versions that matter: Cl
 
 ```
 agents/                          # this repo
-├── AGENTS.md                    # global instructions, canonical (tool-neutral)
+├── AGENTS.md                    # instructions for working in this repo
+├── global/AGENTS.md             # global instructions, canonical (tool-neutral)
 ├── skills/<name>/SKILL.md       # Agent Skills standard; one folder per skill
 ├── claude/
 │   ├── rules/*.md               # Claude-only path-scoped rules (~/.claude/rules)
@@ -30,13 +31,13 @@ agents/                          # this repo
 
 | Link (created by `install.sh`) | → target in repo | Why this form |
 |---|---|---|
-| `~/.claude/CLAUDE.md` | `AGENTS.md` | Claude Code has no user-level `AGENTS.md`, only `~/.claude/CLAUDE.md` ([memory](https://code.claude.com/docs/en/memory)). |
+| `~/.claude/CLAUDE.md` | `global/AGENTS.md` | Claude Code has no user-level `AGENTS.md`, only `~/.claude/CLAUDE.md` ([memory](https://code.claude.com/docs/en/memory)). |
 | `~/.claude/skills` | `skills/` | Claude reads `~/.claude/skills`, not `~/.agents/skills` ([skills](https://code.claude.com/docs/en/skills)). |
 | `~/.claude/rules` | `claude/rules/` | User-level rules ([memory](https://code.claude.com/docs/en/memory)). |
 | `~/.agents/skills` | `skills/` | Read by Codex, Copilot CLI, VS Code and Cursor (see table). |
-| `~/.codex/AGENTS.md` | `AGENTS.md` | Codex global instructions ([agents-md](https://learn.chatgpt.com/docs/agent-configuration/agents-md)). |
+| `~/.codex/AGENTS.md` | `global/AGENTS.md` | Codex global instructions ([agents-md](https://learn.chatgpt.com/docs/agent-configuration/agents-md)). |
 | `~/.codex/rules` | `codex/rules/` | Link the **directory**. Codex silently ignores symlinked `.rules` *files* ([#32658](https://github.com/openai/codex/issues/32658)). |
-| `~/.copilot/copilot-instructions.md` | `AGENTS.md` | Copilot CLI user instructions ([CLI instructions](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions)). |
+| `~/.copilot/copilot-instructions.md` | `global/AGENTS.md` | Copilot CLI user instructions ([CLI instructions](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions)). |
 
 **[Rec]** Use plain `ln -sfn` rather than stow or chezmoi. The targets are spread across four dotdirs that each also hold runtime state, and the Codex rules quirk needs a directory-level link. A script states each of these links explicitly.
 

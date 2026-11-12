@@ -57,17 +57,15 @@ function Link([string]$relative, [string]$dst) {
     }
 }
 
-Link 'AGENTS.md'    (Join-Path $HOME '.claude/CLAUDE.md')
+Link 'global/AGENTS.md' (Join-Path $HOME '.claude/CLAUDE.md')
 Link 'skills'       (Join-Path $HOME '.claude/skills')
 Link 'claude/rules' (Join-Path $HOME '.claude/rules')
 
 Link 'skills'       (Join-Path $HOME '.agents/skills')
 
-Link 'AGENTS.md'    (Join-Path $codexHome 'AGENTS.md')
+Link 'global/AGENTS.md' (Join-Path $codexHome 'AGENTS.md')
 # Must be a directory link: Codex ignores symlinked .rules files (openai/codex#32658).
 Link 'codex/rules'  (Join-Path $codexHome 'rules')
-
-Link 'AGENTS.md'    (Join-Path $HOME '.copilot/copilot-instructions.md')
 
 # Runs a plugin CLI command unless dry-running; a failure is reported, not fatal.
 function Run([string]$exe, [string[]]$arguments) {

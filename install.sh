@@ -36,17 +36,15 @@ link() {
   fi
 }
 
-link AGENTS.md      "$HOME/.claude/CLAUDE.md"
+link global/AGENTS.md "$HOME/.claude/CLAUDE.md"
 link skills         "$HOME/.claude/skills"
 link claude/rules   "$HOME/.claude/rules"
 
 link skills         "$HOME/.agents/skills"
 
-link AGENTS.md      "$codex_home/AGENTS.md"
+link global/AGENTS.md "$codex_home/AGENTS.md"
 # Must be a directory link: Codex ignores symlinked .rules files (openai/codex#32658).
 link codex/rules    "$codex_home/rules"
-
-link AGENTS.md      "$HOME/.copilot/copilot-instructions.md"
 
 # Runs a plugin CLI command unless dry-running; a failure is reported, not fatal.
 run() {
