@@ -31,9 +31,13 @@ Keep an issue or PR number only when it points to an open constraint the reader 
 
 **Required comments.** Before you delete a doc comment or tag, check whether repository guidance or the linter, analyzer, compiler or documentation build requires it, including visibility rules and test exemptions. Rewrite a required comment that fails its test as short, accurate documentation instead of deleting it. Leave the rules and their suppressions unchanged.
 
+**Links.** A link to the source that owns a claim, or to vendor documentation of it, such as an RFC, a specification, a library's docs or source, or MDN, stays with the claim it supports, because it lets the reader check the claim without repeating the search. It goes when its claim goes.
+
 ## Check claims
 
 Check each claim you keep or rewrite against the code or another authoritative source. Correct a wrong claim only if the corrected sentence still passes its test; otherwise delete it. A correction that needs more words than the original usually means the sentence should go.
+
+When you consulted an external source to settle a claim you keep, link it from the comment. Link the most precise target, with a `#section` fragment where the source has one, and check that the fragment resolves. Link the owner rather than a write-up of it, such as a blog post or forum answer. Prefer stable URLs, such as `https://www.rfc-editor.org/rfc/rfc9110#section-15.5.1` or a versioned page, over search results, drafts and pages that move. Pin a link to source code to a commit or tag, with a line anchor.
 
 Failing to verify a claim does not make it false. Keep an unverified claim only when it may record an external constraint or workaround, leave its wording alone, and flag it in the recap.
 
@@ -51,4 +55,4 @@ Move a comment within its file when that puts it where its reader looks. Leave m
 
 Read the final diff for lost contracts or rationale and for code changes. If doc-comment coverage, required tags or symbol references changed, run the check that enforces them.
 
-In the recap, give the resolved base and any path restriction, the meaningful edits, the claims left unverified, and the checks you ran or could not run. For each comment you kept, name in one line the mistake it prevents, the caller need it serves or the requirement it satisfies. For a maintainer comment, also name the test you found or "no test".
+In the recap, give the resolved base and any path restriction, the meaningful edits, the links added, the claims left unverified, and the checks you ran or could not run. For each comment you kept, name in one line the mistake it prevents, the caller need it serves or the requirement it satisfies. For a maintainer comment, also name the test you found or "no test".
