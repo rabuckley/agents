@@ -27,7 +27,16 @@ Each commit should be one logical change.
 
 `git commit` takes the whole index, including whatever `git rm` or `git mv` staged when they ran and whatever a failed commit left staged. Check `git diff --cached --name-status` before each commit.
 
-When a change corrects something an unpushed commit on this branch introduced, commit it as a fixup of that commit, so the history never contradicts itself: `git commit --fixup=<sha>`, or `--fixup=amend:<sha>` with a corrected message when the change makes that commit's message wrong. To fold fixups in, run `GIT_SEQUENCE_EDITOR=: GIT_EDITOR=true git rebase -i --autosquash <base>` yourself once the user wants history tidied, after creating a backup branch. Offer `/restructure-commits` when the fixups need regrouping.
+When a change corrects something an unpushed commit on this branch introduced, commit it as a fixup of that commit, so the history never contradicts itself: `git commit --fixup=<sha>`, or `--fixup=amend:<sha>` with a corrected message when the change makes that commit's message wrong. Route fixups by hunk: each hunk goes to the commit that introduced the lines it touches (`git blame`). When a fix changes an API, the call sites a later commit added go in that later commit's fixup; otherwise the commits between won't build. To stage part of a file, write those hunks to a patch and `git apply --cached` it.
+
+Once the user wants history tidied, create a backup branch, then fold the fixups in:
+
+```sh
+GIT_SEQUENCE_EDITOR=: GIT_EDITOR=true git rebase -i --autosquash --autostash \
+  --exec '<check>' --reschedule-failed-exec "$(git merge-base HEAD <target>)"
+```
+
+`<target>` is the branch this one merges into; `<check>` is the repo's build, plus tests where affordable. `--autostash` sets uncommitted work aside, so it neither blocks the rebase nor leaks into the checks. `--exec` checks each resulting commit in place, so no separate worktree is needed. When a check fails, the rebase stops on that commit: fix it, `git commit --amend --no-edit`, and `git rebase --continue` reruns the check. Report any commit left unchecked. Offer `/restructure-commits` when the fixups need regrouping.
 
 Git rejects `-F` with any `--fixup`, and `-m` with `--fixup=amend:`. Without an editor, run `git commit --fixup=amend:<sha> --no-edit`, then `git commit --amend -F <file>`. The file must contain the `amend!` marker, a blank line, then the complete replacement message starting with its own subject:
 
