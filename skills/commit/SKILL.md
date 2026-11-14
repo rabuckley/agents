@@ -27,7 +27,7 @@ Each commit should be one logical change.
 
 `git commit` takes the whole index, including whatever `git rm` or `git mv` staged when they ran and whatever a failed commit left staged. Check `git diff --cached --name-status` before each commit.
 
-When a change corrects something an unpushed commit on this branch introduced, commit it as a fixup of that commit, so the history never contradicts itself: `git commit --fixup=<sha>`, or `--fixup=amend:<sha>` with a corrected message when the change makes that commit's message wrong. Route fixups by hunk: each hunk goes to the commit that introduced the lines it touches (`git blame`). When a fix changes an API, the call sites a later commit added go in that later commit's fixup; otherwise the commits between won't build. To stage part of a file, write those hunks to a patch and `git apply --cached` it.
+When a change corrects or completes an unpushed commit on this branch, commit it as an fixup/amend of that commit, so the history never contradicts itself: `git commit --fixup=<sha>`, or `--fixup=amend:<sha>` with a corrected message when the change makes that commit's message wrong. Route each hunk to the commit whose change made it necessary. `git blame` finds that commit only when the hunk edits lines the commit wrote; for a stale doc, find the commit that changed the behaviour it describes. When a fix changes an API, the call sites a later commit added go in that later commit's fixup; otherwise the commits between won't build. To stage part of a file, write those hunks to a patch and `git apply --cached` it.
 
 Once the user wants history tidied, create a backup branch, then fold the fixups in:
 
