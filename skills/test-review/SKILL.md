@@ -3,10 +3,11 @@ name: test-review
 description: >
   Review tests against one yardstick — a test earns its place when it fails if
   the behaviour it claims changes and survives refactors that keep the
-  interface it tests intact. Flags
-  implementation coupling, interaction verification, over- and under-assertion,
-  non-determinism, and redundancy, with a deletion recommendation for every
-  redundant test. Report only — no code changes. Use when the user wants tests
+  interface it tests intact, with expected values that come from somewhere
+  other than the code under test. Flags implementation coupling, interaction
+  verification, over- and under-assertion, non-determinism, redundancy, and
+  restatements of the code's own declarations, with a deletion recommendation
+  for every redundant test. Report only — no code changes. Use when the user wants tests
   reviewed or audited, asks whether tests are valuable, brittle, or redundant,
   or wants a test suite cleaned up. Do NOT use for writing tests (tdd),
   reviewing production code, or module structure
@@ -25,7 +26,9 @@ survives refactors that keep the interface it tests intact.**
 Both halves bind. Over-specification (interaction verification, asserted
 incidentals) fails the refactor half; under-assertion (not-null, doesn't-throw)
 fails the behaviour half; non-determinism decouples the result from the code
-and fails both.
+and fails both. A restatement passes both halves and still finds nothing:
+its expected value is a copy of the code under test, so criterion 10 asks
+where each expected value comes from.
 
 Observable behaviour is what the unit promises its callers. That includes calls
 that are themselves the output — an email sent, an event published, a command
@@ -133,6 +136,24 @@ delta without a debugger. Flag only names that fail to distinguish the case
 and assertions whose failure output hides the delta.
 Evidence: the current name or output beside what a failure would actually tell
 the reader.
+
+**10. Independent expected values.** An expected value must come from
+somewhere other than the code under test: a rule that holds across many cases
+(every property is snake_case, every route is named), an outcome a caller
+observes when it acts (the request is refused with this code), or a previous
+release (the published contract it must stay compatible with). Flag a
+restatement: an assertion that copies a declaration from the code under test,
+such as an operation id beside its `WithName`, a schema's property list beside
+the type that generates it, or an enum's wire values beside their attributes.
+It fails on every intended change, and catches an unintended one only if the
+author forgets to update the test, when the usual fix is to update the test.
+Asserting a stable interface does not excuse it: a generated document is the
+most stable interface an API has, and a restatement of it checks only that
+the generator mapped the declarations. A value checked against a second
+source, such as a document bound compared with the domain constant that
+validates it, is not a restatement. Evidence: the declaration the expected
+value copies, and the intended change that would make the test fail. Remedy:
+deletion, or one assertion of the rule the copies were standing in for.
 
 ## Report
 
