@@ -17,6 +17,6 @@ Keep skill-authoring guidance in `skills/AGENTS.md`: the root file is installed 
 
 Compare execution quality against a baseline in fresh contexts, grade observable outcomes, and generalise fixes rather than patching individual examples. [Agent Skills: Evaluating output quality](https://agentskills.io/skill-creation/evaluating-skills)
 
-Check baseline isolation explicitly. Local [test-review eval notes](../../skills/test-review/evals/README.md) record skill discovery through metadata and adjacent files, plus diagnostic filenames leaking expected answers. These are repository observations, not universal host guarantees. Keep proposed cases distinct from executed evidence, as the local [documentation decision cases](../../skills/csharp-xml-docs/evals/README.md) do.
+Check baseline isolation explicitly. Earlier test-review eval runs here recorded skill discovery through metadata and adjacent files, plus diagnostic filenames leaking expected answers. These are repository observations, not universal host guarantees. Keep proposed cases distinct from executed evidence, as the local [documentation decision cases](../../skills/csharp-xml-docs/evals/README.md) do.
 
 For invocation fields, check the intended host: [Claude Code's controls](https://code.claude.com/docs/en/skills#control-who-invokes-a-skill) differ from Codex's optional metadata. Treat successful format validation as separate from evidence that the host honours a field.

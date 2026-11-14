@@ -14,5 +14,5 @@ Consult these when the corresponding question arises:
 - Format or paths: [Agent Skills specification](https://agentskills.io/specification).
 - Trigger accuracy: [description evaluation](https://agentskills.io/skill-creation/optimizing-descriptions).
 - Instruction structure: [Anthropic authoring guidance](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices).
-- Eval design and interpretation: [output evaluation](https://agentskills.io/skill-creation/evaluating-skills); local [baseline contamination examples](test-review/evals/README.md).
+- Eval design and interpretation: [output evaluation](https://agentskills.io/skill-creation/evaluating-skills).
 - Host differences and source provenance: [research notes](../docs/research/skill-writing.md).
